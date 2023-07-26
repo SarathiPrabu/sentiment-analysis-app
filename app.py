@@ -23,15 +23,10 @@ def load_data():
 
 df = load_data()
 
-selected_patent_info = st.sidebar.selectbox("Select the Patent:", df["patent_number"])
+st.sidebar.subheader("Select the Patent:")
+selected_patent_number = st.sidebar.selectbox("", df["patent_number"])
 
-with st.form("patent-form"):
-    st.subheader("Patent Application Number:")
-    selected_patent_number = st.selectbox("", df["patent_number"])
-
-    submitted = st.form_submit_button(label="Submit")
-
-if submitted:
+if st.sidebar.button("Submit"):
     st.subheader(f"Patent Application Number: {selected_patent_number}")
 
     model_name = "distilbert-base-uncased-finetuned-sst-2-english"
