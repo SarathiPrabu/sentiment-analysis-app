@@ -1,24 +1,11 @@
 import streamlit as st
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
-import torch
 import pandas as pd
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 from datasets import load_dataset
 
+st.title("USPTO Patentability Score")
 
-# Check if GPU is available
-if torch.cuda.is_available():
-    device = 0
-else:
-    # If GPU is not available, use CPU
-    device = torch.device("cpu")
-
-
-# model_name = "facebook/bart-large-mnli"
-# nlp_pipeline = pipeline("zero-shot-classification", model=model_name, device=device)
-# st.title("USPTO Patentability Score")
-
-
-@st.cache_data()
+@st.cache(allow_output_mutation=True)
 def load_data():
     dataset_dict = load_dataset(
         "HUPD/hupd",
@@ -34,23 +21,17 @@ def load_data():
     df = df[["patent_number", "title", "decision", "abstract", "claims", "filing_date"]]
     return df
 
-
 df = load_data()
-patent_info = df[["patent_number", "title"]]
-patent_info["patent_info"] = patent_info.apply(
-    lambda row: f"{row['patent_number']} - {row['title']}", axis=1
-)
 
-patent_number = patent_info["patent_info"].drop_duplicates().reset_index(drop=True)
-
-st.sidebar.subheader("Select the Patent:")
-make_choice = st.sidebar.selectbox("", patent_number)
+selected_patent_info = st.sidebar.selectbox("Select the Patent:", df["patent_number"])
 
 with st.form("patent-form"):
+    st.subheader("Patent Application Number:")
+    selected_patent_number = st.selectbox("", df["patent_number"])
+
     submitted = st.form_submit_button(label="Submit")
 
 if submitted:
-    selected_patent_number = make_choice.split(" - ")[0]
     st.subheader(f"Patent Application Number: {selected_patent_number}")
 
     model_name = "distilbert-base-uncased-finetuned-sst-2-english"
@@ -58,9 +39,8 @@ if submitted:
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
 
-    decision = df["decision"].loc[df["patent_number"] == selected_patent_number]
-    X_train = decision.to_string(index=False)
-    results = classifier(X_train, truncation=True)
+    decision_text = df["decision"].loc[df["patent_number"] == selected_patent_number].to_string(index=False)
+    results = classifier(decision_text, truncation=True)
 
     for result in results:
         score = result["score"]
