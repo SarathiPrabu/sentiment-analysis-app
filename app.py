@@ -18,7 +18,7 @@ else:
 # st.title("USPTO Patentability Score")
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data()
 def load_data():
     dataset_dict = load_dataset(
         "HUPD/hupd",
