@@ -24,7 +24,9 @@ def load_data():
 df = load_data()
 
 st.sidebar.subheader("Select the Patent:")
-selected_patent_number = st.sidebar.selectbox("", df["patent_number"])
+df["patent_number_with_title"] = df["patent_number"] + " - " + df["title"]
+st.sidebar.subheader("Select the Patent:")
+selected_patent_number = st.sidebar.selectbox("", df["patent_number_with_title"])
 
 if st.sidebar.button("Submit"):
     st.subheader(f"Patent Application Number: {selected_patent_number}")
