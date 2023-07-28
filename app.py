@@ -31,7 +31,7 @@ if st.sidebar.button("Submit"):
 
     model_name = "sarathi/patentability"
     model = AutoModelForSequenceClassification.from_pretrained(model_name)
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased-finetuned-sst-2-english")
     classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
 
     # Get the decision text for the selected patent number
