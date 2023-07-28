@@ -29,7 +29,7 @@ selected_patent_number = st.sidebar.selectbox("", df["patent_number_with_title"]
 if st.sidebar.button("Submit"):
     st.subheader(f"Patent Application Number: {selected_patent_number}")
 
-    model_name = "distilbert-base-uncased-finetuned-sst-2-english"
+    model_name = "sarathi/patentability"
     model = AutoModelForSequenceClassification.from_pretrained(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
