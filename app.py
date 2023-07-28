@@ -5,7 +5,7 @@ from datasets import load_dataset
 
 st.title("USPTO Patentability Score")
 st.sidebar.subheader("Select the Patent:")
-st.subheader("CS-670")
+
 @st.cache_data()
 def load_data():
     dataset_dict = load_dataset(
