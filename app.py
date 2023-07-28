@@ -4,7 +4,8 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipe
 from datasets import load_dataset
 
 st.title("USPTO Patentability Score")
-
+st.sidebar.subheader("Select the Patent:")
+st.subheader("CS-670")
 @st.cache_data()
 def load_data():
     dataset_dict = load_dataset(
@@ -22,10 +23,7 @@ def load_data():
     return df
 
 df = load_data()
-
-st.sidebar.subheader("Select the Patent:")
 df["patent_number_with_title"] = df["patent_number"] + " - " + df["title"]
-st.sidebar.subheader("Select the Patent:")
 selected_patent_number = st.sidebar.selectbox("", df["patent_number_with_title"])
 
 if st.sidebar.button("Submit"):
@@ -36,17 +34,19 @@ if st.sidebar.button("Submit"):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     classifier = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
 
-    decision_text = df["decision"].loc[df["patent_number"] == selected_patent_number].to_string(index=False)
+    # Get the decision text for the selected patent number
+    decision_text = df["decision"].loc[df["patent_number_with_title"] == selected_patent_number].to_string(index=False)
+
     results = classifier(decision_text, truncation=True)
 
     for result in results:
         score = result["score"]
         st.write("The Patentability Score is:", score)
 
-    abstract = df["abstract"].loc[df["patent_number"] == selected_patent_number]
+    abstract = df["abstract"].loc[df["patent_number_with_title"] == selected_patent_number]
     st.subheader("Abstract:")
     st.info(abstract.iloc[0])
 
-    claims = df["claims"].loc[df["patent_number"] == selected_patent_number]
+    claims = df["claims"].loc[df["patent_number_with_title"] == selected_patent_number]
     st.subheader("Claim:")
     st.info(claims.iloc[0])
